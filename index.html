@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Match Report</title>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <style>
+    /* Dodaj odpowiednie style dla strony */
+  </style>
+</head>
+<body>
+
+  <div id="match-report">
+    <!-- Tutaj umieść kod do wyświetlania relacji z meczu -->
+    <div id="match-data"></div>
+
+    <!-- Wyświetlanie aktualnego wyniku ponad belką -->
+    <div id="current-score"></div>
+
+    <!-- Wyświetlanie ostatnich wiadomości -->
+    <div id="last-messages"></div>
+  </div>
+
+  <!-- Checkbox do pokazywania informacji diagnostycznych -->
+  <label>
+    Show Diagnostic Info
+    <input type="checkbox" id="show-diagnostic-info">
+  </label>
+
+  <!-- Wyświetlanie informacji diagnostycznych -->
+  <div id="diagnostic-info"></div>
+
+  <script>
+    $(document).ready(function () {
+      const matchDataContainer = $('#match-data');
+      const currentScoreContainer = $('#current-score');
+      const lastMessagesContainer = $('#last-messages');
+      const showDiagnosticInfoCheckbox = $('#show-diagnostic-info');
+      const diagnosticInfoContainer = $('#diagnostic-info');
+
+      const messages = [
+        'Minuta 15: Gol dla Drużyny A!',
+        'Minuta 30: Żółta kartka dla zawodnika Drużyny B',
+        'Minuta 60: Gol dla Drużyny B!',
+        'Minuta 65: Gol dla Drużyny B!',
+        'Minuta 69: Gol dla Drużyny B!',
+        'Minuta 75: Zmiana w składzie Drużyny A',
+        'Minuta 90: Koniec meczu!'
+      ];
+
+      let messageIndex = 0;
+      let goalsTeamA = 0; // Licznik goli dla Drużyny A
+      let goalsTeamB = 0; // Licznik goli dla Drużyny B
+      let matchEnded = false; // Flaga informująca, czy mecz zakończył się
+      let lastMessages = []; // Tablica przechowująca ostatnie wiadomości
+
+      const updateMatchReport = () => {
+        // Sprawdź, czy mecz zakończył się
+        if (messageIndex >= messages.length || matchEnded) {
+          clearInterval(intervalId); // Zatrzymaj interwał
+          return;
+        }
+
+        // Symuluj dynamiczne dane z serwera (lokalnego)
+        const matchData = 'Mecz pomiędzy Drużyna A i Drużyna B';
+
+        // Przykładowa aktualizacja zawartości na podstawie danych z serwera
+        matchDataContainer.text(matchData);
+
+        // Dodaj nową wiadomość do tablicy
+        const newMessage = messages[messageIndex];
+        lastMessages.push(newMessage);
+
+        // Ogranicz tablicę do ostatnich 6 wiadomości
+        if (lastMessages.length > 6) {
+          lastMessages.shift(); // Usuń pierwszą wiadomość z tablicy
+        }
+
+        // Wyświetl tylko ostatnie wiadomości
+        lastMessagesContainer.html(lastMessages.join('<br>'));
+
+        // Zwiększ indeks wiadomości, zabezpieczając się przed przekroczeniem ilości wiadomości
+        messageIndex = (messageIndex + 1) % messages.length;
+
+        // Aktualizacja wyniku w przypadku golu
+        if (newMessage.includes('Gol')) {
+          const goalRegex = /Gol dla Drużyny ([A|B])/;
+          const matchResult = newMessage.match(goalRegex);
+          if (matchResult && matchResult[1]) {
+            if (matchResult[1] === 'A') {
+              goalsTeamA += 1;
+            } else {
+              goalsTeamB += 1;
+            }
+          }
+        }
+
+        // Sprawdź, czy wiadomość o końcu meczu
+        if (newMessage.includes('Koniec meczu!')) {
+          matchEnded = true;
+        }
+
+        // Aktualizacja tekstu wyniku
+        currentScoreContainer.text(`Aktualny wynik: ${goalsTeamA}:${goalsTeamB}`);
+
+        // Dodatkowo, pobierz informacje diagnostyczne i zaktualizuj zawartość diagnosticInfoContainer
+        const newDiagnosticInfo = 'Informacje diagnostyczne';
+        diagnosticInfoContainer.text(newDiagnosticInfo);
+      };
+
+      // Ustaw interwał na 2 sekundy
+      const intervalId = setInterval(updateMatchReport, 2000);
+    });
+  </script>
+</body>
+</html>
